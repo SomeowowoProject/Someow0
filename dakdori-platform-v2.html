@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Dakdori.</title>
+<style>
+/* ─── DESIGN SYSTEM TOKENS ──────────────────────────────── */
+:root {
+  --bg-color:       #ffffff;
+  --text-color:     #000000;
+  --text-secondary: #777777;
+  --border-color:   #eeeeee;
+  --cta-color:      #000000;
+  --del-color:      #000000;
+  --input-bg:       transparent;
+  --hover-bg:       #f9f9f9;
+}
+[data-theme="system"] {
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --bg-color:       #000000;
+    --text-color:     #ffffff;
+    --text-secondary: #888888;
+    --border-color:   #222222;
+    --cta-color:      #ffffff;
+    --del-color:      #ffffff;
+    --hover-bg:       #111111;
+  }
+}
+[data-theme="dark"] {
+  --bg-color:       #000000;
+  --text-color:     #ffffff;
+  --text-secondary: #888888;
+  --border-color:   #222222;
+  --cta-color:      #ffffff;
+  --del-color:      #ffffff;
+  --hover-bg:       #111111;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  max-width: 1440px;
+  margin: 0 auto;
+  transition: background-color 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+button { background: transparent; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: var(--text-color); transition: opacity 0.2s; }
+button:hover { opacity: 0.7; }
+input, textarea { background: var(--input-bg); border: none; color: var(--text-color); font-family: inherit; font-size: 1rem; resize: none; outline: none; border-bottom: 1px solid transparent; width: 100%; }
+input:focus, textarea:focus { border-bottom-color: var(--text-color); }
+input::placeholder, textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
+a { color: inherit; text-decoration: none; }
+
+/* ─── SCREEN SYSTEM ──────────────────────────────────────── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ─── GLOBAL NAV ─────────────────────────────────────────── */
+.nav-wrapper {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+.nav {
+  display: flex; align-items: center;
+  height: 56px;
+  padding: 0 1.5rem;
+  gap: 0;
+  background: var(--bg-color);
+}
+.logo { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.5px; cursor: pointer; flex-shrink: 0; padding-right: 1.5rem; }
+.nav-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 1rem; }
+.search-row { display: flex; align-items: center; gap: 0; width: 100%; max-width: 580px; }
+.search-row-inner {
+  display: flex; align-items: center; flex: 1; min-width: 0;
+}
+.search-box-wrap {
+  display: flex; align-items: center; flex: 1; min-width: 0;
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: 20px 0 0 20px;
+  transition: border-color 0.15s;
+  z-index: 1;
+}
+.search-box-wrap:focus-within {
+  border-color: var(--text-color);
+  z-index: 2;
+}
+.search-icon-slot {
+  position: absolute; left: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; opacity: 0;
+  pointer-events: none;
+  transform: translateX(-8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+.search-box-wrap.focused .search-icon-slot {
+  opacity: 0.7;
+  transform: translateX(0);
+}
+.search-box {
+  flex: 1; border: none;
+  display: flex; align-items: center;
+  padding: 0 14px; height: 38px;
+  min-width: 0;
+  transition: padding-left 0.2s ease;
+  background: transparent;
+}
+.search-box-wrap.focused .search-box { padding-left: 28px; }
+.search-box input { font-size: 0.9rem; width: 100%; }
+.search-box input:focus { border-bottom-color: transparent; }
+.nav-search-btn {
+  height: 40px; padding: 0 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 0 20px 20px 0;
+  margin-left: -1px;
+  font-size: 0.85rem; color: var(--text-secondary);
+  background: var(--hover-bg); white-space: nowrap;
+  flex-shrink: 0; outline: none;
+}
+.nav-search-btn:hover { opacity: 1; color: var(--text-color); }
+.btn-new {
+  font-size: 0.85rem; border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0 16px; height: 34px; color: var(--cta-color);
+  white-space: nowrap;
+}
+.btn-new:hover { opacity: 1; background: var(--hover-bg); }
+.nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-left: 1rem; }
+.theme-btn {
+  font-size: 0.8rem; color: var(--text-secondary); text-transform: lowercase;
+  border: 1px solid var(--border-color); border-radius: 20px;
+  padding: 0 12px; height: 34px;
+}
+.theme-btn:hover { color: var(--text-color); opacity: 1; background: var(--hover-bg); }
+.avatar-nav {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600; cursor: pointer;
+}
+/* ─── CHIP STRIP (separate row, like YouTube) ────────────── */
+.chip-bar {
+  display: flex; align-items: center;
+  height: 50px; padding: 0 1.5rem;
+  border-top: 1px solid var(--border-color);
+  gap: 0;
+}
+.cat-strip-wrap { display: flex; align-items: center; flex: 1; min-width: 0; gap: 0; }
+.cat-strip {
+  display: flex; gap: 6px; overflow-x: auto;
+  flex: 1; min-width: 0;
+  scrollbar-width: none; scroll-behavior: smooth;
+  padding: 6px 0;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.cat-strip.at-start {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.cat-strip.at-end {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24px);
+  mask-image: linear-gradient(to right, transparent 0, #000 24px);
+}
+.cat-strip.at-start.at-end { -webkit-mask-image: none; mask-image: none; }
+.cat-strip::-webkit-scrollbar { display: none; }
+.cat-pill {
+  font-size: 0.82rem; padding: 0 12px; height: 30px;
+  background: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-color);
+  white-space: nowrap; cursor: pointer;
+  display: flex; align-items: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cat-pill:hover { background: var(--border-color); opacity: 1; }
+.cat-pill.active {
+  background: var(--text-color);
+  border-color: var(--text-color);
+  color: var(--bg-color);
+}
+.cat-arr {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-size: 14px; color: var(--text-secondary);
+  cursor: pointer; flex-shrink: 0; padding: 0; line-height: 1;
+  background: var(--bg-color);
+}
+.cat-arr:hover { color: var(--text-color); opacity: 1; }
+.cat-arr.hidden { visibility: hidden; pointer-events: none; }
+
+/* ─── LAYOUT ─────────────────────────────────────────────── */
+.layout { display: flex; min-height: calc(100vh - 106px); }
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color);
+  padding: 2rem 0;
+  overflow: hidden;
+  transition: width 0.2s;
+}
+.sidebar.collapsed { width: 40px; }
+.sb-toggle { display: flex; justify-content: flex-end; padding: 0 8px 12px; }
+.sb-toggle button { font-size: 1.1rem; color: var(--text-secondary); }
+.sb-toggle button:hover { opacity: 1; color: var(--text-color); }
+.sb-section { margin-bottom: 1.5rem; }
+.sb-label { font-size: 0.7rem; color: var(--text-secondary); padding: 0 16px; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 5px 16px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; white-space: nowrap; transition: color 0.1s, background 0.1s; }
+.sb-item:hover { color: var(--text-color); background: var(--hover-bg); }
+.sb-item.active { color: var(--text-color); font-weight: 500; }
+.sidebar.collapsed .sb-label, .sidebar.collapsed .sb-item span { display: none; }
+.sidebar.collapsed .sb-item { justify-content: center; padding: 6px; }
+.content { flex: 1; padding: 2rem 4rem; overflow: hidden; }
+
+/* ─── HOME GRID ──────────────────────────────────────────── */
+.section-label { font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1.5rem; }
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+  align-items: start;
+}
+
+/* ─── CARD (original system) ─────────────────────────────── */
+.card-container {
+  perspective: 1200px;
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+}
+.card {
+  width: 100%;
+  aspect-ratio: 16/10;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.card.flip { transform: rotateY(180deg); }
+.card-face {
+  position: absolute;
+  width: 100%; height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  left: 0; top: 0;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  overflow: hidden;
+}
+.card-front {
+  display: flex; align-items: center; justify-content: center;
+  background-color: var(--hover-bg);
+  transform: rotateY(0deg) translateZ(1px);
+}
+.card-back {
+  transform: rotateY(180deg) translateZ(1px);
+  display: flex; flex-direction: column;
+  padding: 1.5rem; gap: 0.5rem;
+}
+/* front-text hover reveal */
+.front-text-wrapper {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 5;
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.49s cubic-bezier(0.22,1,0.36,1);
+}
+.card-container:hover .front-text-wrapper.has-text {
+  grid-template-rows: 1fr;
+}
+.front-text-inner { overflow: hidden; min-height: 0; }
+.front-text {
+  padding-top: 0.75rem;
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.card-container:hover .front-text-wrapper.has-text .front-text {
+  opacity: 1; transform: translateY(0);
+  transition: opacity 0.3s ease 0.1s, transform 0.49s cubic-bezier(0.22,1,0.36,1);
+}
+.front-title { font-size: 0.95rem; font-weight: 500; color: var(--text-color); margin-bottom: 2px; }
+.front-description { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+.card-thumb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 0.85rem; }
+.card-thumb-initials { font-size: 1.4rem; font-weight: 600; color: var(--border-color); }
+.card-back-title { font-size: 1.1rem; font-weight: 500; }
+.card-back-desc { font-size: 0.85rem; color: var(--text-secondary); flex: 1; }
+.card-back-meta { font-size: 0.8rem; color: var(--text-secondary); }
+.card-back-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+.tag { font-size: 0.75rem; border: 1px solid var(--border-color); padding: 1px 6px; color: var(--text-secondary); }
+.card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+.open-btn { font-size: 0.8rem; color: var(--cta-color); }
+
+/* ─── PROFILE SCREEN ─────────────────────────────────────── */
+.profile-cover {
+  height: 180px;
+  background: var(--hover-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+.profile-cover .cover-edit {
+  position: absolute; right: 1.5rem; top: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  background: var(--bg-color);
+  display: none;
+}
+body.profile-edit .profile-cover .cover-edit { display: block; }
+.profile-body-wrap { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+.profile-header { display: flex; gap: 1.5rem; align-items: flex-start; margin: -42px 0 1.5rem; }
+.profile-av-large {
+  width: 96px; height: 96px;
+  border: 3px solid var(--bg-color);
+  background: var(--hover-bg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; font-weight: 600;
+  flex-shrink: 0;
+  position: relative;
+}
+.profile-av-large .av-edit {
+  position: absolute; bottom: 0; right: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--text-color); color: var(--bg-color);
+  display: none; align-items: center; justify-content: center;
+  font-size: 11px; cursor: pointer;
+  border: 2px solid var(--bg-color);
+}
+body.profile-edit .profile-av-large .av-edit { display: flex; }
+.profile-id { flex: 1; padding-top: 48px; min-width: 0; }
+.profile-name {
+  font-size: 1.6rem; font-weight: 600; letter-spacing: -0.5px;
+  margin-bottom: 4px;
+  outline: none;
+}
+body.profile-edit .profile-name { border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
+.profile-handle { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 4px; outline: none; }
+body.profile-edit .profile-handle { border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; display: inline-block; }
+.profile-headline {
+  font-size: 0.95rem; color: var(--text-color); margin-top: 8px;
+  outline: none;
+}
+body.profile-edit .profile-headline { border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
+.profile-meta-row {
+  display: flex; gap: 16px; margin-top: 10px;
+  font-size: 0.82rem; color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+.profile-meta-row span { display: flex; align-items: center; gap: 4px; }
+.profile-actions {
+  display: flex; gap: 8px; margin: 1.25rem 0 2rem;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  border: 1px solid var(--text-color);
+  background: var(--text-color); color: var(--bg-color);
+  border-radius: 20px; padding: 7px 16px; font-size: 0.85rem;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-secondary {
+  border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 7px 16px; font-size: 0.85rem;
+}
+.btn-secondary:hover { background: var(--hover-bg); opacity: 1; }
+.btn-danger {
+  border: 1px solid var(--del-color); color: var(--del-color);
+  border-radius: 20px; padding: 7px 16px; font-size: 0.85rem;
+  background: transparent;
+}
+.btn-danger:hover { background: var(--hover-bg); opacity: 1; }
+.profile-stats-row {
+  display: flex; gap: 2rem; padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+.profile-stat-card { font-size: 0.85rem; }
+.profile-stat-card strong { display: block; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.5px; }
+.profile-stat-card span { color: var(--text-secondary); }
+.profile-tabs {
+  display: flex; border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+  position: sticky; top: 106px;
+  background: var(--bg-color);
+  z-index: 50;
+}
+.p-tab {
+  font-size: 0.9rem; padding: 10px 16px;
+  color: var(--text-secondary); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+}
+.p-tab:hover { color: var(--text-color); }
+.p-tab.active { color: var(--text-color); border-bottom-color: var(--text-color); font-weight: 500; }
+.profile-tab-content { display: none; }
+.profile-tab-content.active { display: block; }
+
+/* ── About section ── */
+.about-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+.about-block { }
+.about-block-label {
+  font-size: 0.7rem; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.about-block-value { font-size: 0.9rem; line-height: 1.6; outline: none; }
+.about-block { position: relative; }
+.about-block .item-x, .experience-item .item-x, .review-item .item-x {
+  position: absolute; top: 2px; right: 0;
+  display: none;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 6px 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.about-block:hover .item-x,
+.experience-item:hover .item-x,
+.review-item:hover .item-x { opacity: 1; }
+.about-block .item-x:hover,
+.experience-item .item-x:hover,
+.review-item .item-x:hover {
+  color: var(--text-color);
+  background: none !important;
+  border: none !important;
+  opacity: 1;
+}
+body.profile-edit .about-block .item-x,
+body.profile-edit .experience-item .item-x,
+body.profile-edit .review-item .item-x { display: block; }
+.experience-item { position: relative; }
+.review-item { position: relative; }
+body.profile-edit .about-block-value {
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 2px;
+}
+.about-bio {
+  font-size: 0.95rem; line-height: 1.7;
+  margin-bottom: 2.5rem; max-width: 640px;
+  outline: none;
+}
+body.profile-edit .about-bio {
+  border: 1px dashed var(--border-color);
+  padding: 12px;
+  border-radius: 4px;
+}
+.section-divider {
+  height: 1px; background: var(--border-color);
+  margin: 2.5rem 0;
+}
+.section-title {
+  font-size: 1.05rem; font-weight: 600;
+  letter-spacing: -0.3px;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title .add-inline {
+  font-size: 0.75rem; color: var(--cta-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 2px 10px;
+  display: none;
+  cursor: pointer;
+}
+body.profile-edit .section-title .add-inline { display: inline-flex; }
+
+/* ── Skills / Tools ── */
+.tag-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 1.5rem;
+}
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 4px 12px;
+  font-size: 0.82rem;
+  background: var(--bg-color);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+body:not(.profile-edit) .tag-chip:hover {
+  background: var(--text-color);
+  color: var(--bg-color);
+}
+body.profile-edit .tag-chip { cursor: default; }
+.tag-chip .tag-x {
+  display: none;
+  font-size: 0.7rem; color: var(--text-secondary); cursor: pointer;
+  margin-left: 2px;
+}
+.tag-chip .tag-x:hover { color: var(--del-color); }
+body.profile-edit .tag-chip .tag-x { display: inline; }
+
+/* ── Experience timeline ── */
+.experience-list { }
+.experience-item {
+  display: flex; gap: 1.25rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+}
+.experience-item:first-child { border-top: none; padding-top: 0; }
+.experience-period {
+  width: 140px; flex-shrink: 0;
+  font-size: 0.82rem; color: var(--text-secondary);
+}
+.experience-detail { flex: 1; min-width: 0; }
+.experience-role { font-size: 0.95rem; font-weight: 500; margin-bottom: 2px; outline: none; }
+.experience-org { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; outline: none; }
+.experience-desc {
+  font-size: 0.85rem; line-height: 1.6;
+  color: var(--text-secondary);
+  outline: none;
+}
+body.profile-edit .experience-role,
+body.profile-edit .experience-org,
+body.profile-edit .experience-desc,
+body.profile-edit .experience-period {
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 2px;
+}
+
+/* ── Reviews ── */
+.review-list { display: flex; flex-direction: column; gap: 1rem; }
+.review-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.review-av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--hover-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600;
+  flex-shrink: 0;
+}
+.review-author { font-size: 0.88rem; font-weight: 500; }
+.review-meta { font-size: 0.78rem; color: var(--text-secondary); }
+.review-text { font-size: 0.88rem; line-height: 1.6; }
+
+/* ── Mode badge ── */
+.profile-mode-badge {
+  display: inline-block;
+  font-size: 0.7rem; padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ─── PROJECT DETAIL ─────────────────────────────────────── */
+.detail-layout { display: flex; }
+.detail-main { flex: 1; border-right: 1px solid var(--border-color); }
+.detail-visual {
+  aspect-ratio: 16/9; background: var(--hover-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); font-size: 0.85rem;
+}
+.detail-info { padding: 2rem 3rem; }
+.detail-title { font-size: 1.4rem; font-weight: 500; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
+.detail-meta { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.detail-desc { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.65; max-width: 560px; margin-bottom: 2rem; }
+.detail-section-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+.team-slots { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+.team-slot { display: flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); padding: 4px 10px; font-size: 0.8rem; }
+.team-slot.open { border-style: dashed; color: var(--cta-color); cursor: pointer; }
+.team-slot.open:hover { background: var(--hover-bg); opacity: 1; }
+.detail-sidebar { width: 260px; flex-shrink: 0; padding: 2rem 1.5rem; }
+.author-block { border: 1px solid var(--border-color); padding: 1rem; margin-bottom: 1.5rem; cursor: pointer; }
+.author-block:hover { background: var(--hover-bg); }
+.author-av { width: 28px; height: 28px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+.author-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.author-name { font-size: 0.9rem; font-weight: 500; }
+.author-role-text { font-size: 0.75rem; color: var(--text-secondary); }
+.author-bio-text { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.btn-invite-full { width: 100%; border: 1px solid var(--cta-color); color: var(--cta-color); padding: 6px; font-size: 0.85rem; }
+.related-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+.related-item { display: flex; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border-color); cursor: pointer; }
+.related-item:hover { background: var(--hover-bg); }
+.related-thumb { width: 68px; height: 42px; background: var(--hover-bg); flex-shrink: 0; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-secondary); }
+.related-title { font-size: 0.8rem; font-weight: 500; }
+.related-author-name { font-size: 0.75rem; color: var(--text-secondary); }
+
+/* ─── COMPOSE ────────────────────────────────────────────── */
+.compose-wrap { display: flex; }
+.compose-main { flex: 1; padding: 2rem 4rem; border-right: 1px solid var(--border-color); max-width: 720px; }
+.compose-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.5px; width: 100%; border-bottom: 1px solid transparent; padding-bottom: 4px; margin-bottom: 1rem; }
+.compose-title:focus { border-bottom-color: var(--border-color); }
+.compose-toolbar { display: flex; gap: 2px; border: 1px solid var(--border-color); padding: 3px; margin-bottom: 0.75rem; }
+.tb-btn { font-size: 0.8rem; padding: 3px 8px; color: var(--text-secondary); }
+.tb-btn:hover { opacity: 1; background: var(--hover-bg); color: var(--text-color); }
+.compose-body { min-height: 180px; font-size: 0.95rem; border-bottom: 1px solid transparent; }
+.compose-body:focus { border-bottom-color: var(--border-color); }
+.compose-drop { border: 1px dashed var(--border-color); padding: 2rem; text-align: center; margin: 1rem 0; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; }
+.compose-drop:hover { background: var(--hover-bg); }
+.compose-actions { display: flex; gap: 8px; margin-top: 1.5rem; }
+.btn-publish { border: 1px solid var(--text-color); padding: 6px 18px; font-size: 0.85rem; }
+.btn-draft { border: 1px solid var(--border-color); padding: 6px 14px; font-size: 0.85rem; color: var(--text-secondary); }
+.compose-side { width: 240px; flex-shrink: 0; padding: 2rem 1.5rem; }
+.cs-section { margin-bottom: 1.5rem; }
+.cs-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 6px; }
+.cs-select { width: 100%; border: 1px solid var(--border-color); padding: 5px 8px; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); appearance: none; }
+.cs-input { border-bottom: 1px solid var(--border-color); padding: 3px 0; font-size: 0.85rem; }
+.role-row { display: flex; align-items: center; gap: 6px; border: 1px dashed var(--border-color); padding: 4px 8px; margin-bottom: 4px; font-size: 0.8rem; cursor: pointer; }
+.role-row:hover { background: var(--hover-bg); opacity: 1; }
+.role-add { color: var(--cta-color); border-color: var(--cta-color); }
+
+/* ─── COMMUNITY ──────────────────────────────────────────── */
+.community-wrap { display: flex; }
+.community-feed { flex: 1; border-right: 1px solid var(--border-color); }
+.community-head { padding: 2rem 3rem 0; border-bottom: 1px solid var(--border-color); }
+.community-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 0.75rem; }
+.community-icon { width: 48px; height: 48px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.community-title { font-size: 1.2rem; font-weight: 500; }
+.community-members { font-size: 0.85rem; color: var(--text-secondary); }
+.community-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.btn-join { border: 1px solid var(--cta-color); color: var(--cta-color); font-size: 0.8rem; padding: 3px 12px; margin-left: auto; flex-shrink: 0; }
+.feed-tabs { display: flex; }
+.feed-tab { font-size: 0.85rem; padding: 6px 14px; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.feed-tab.active { color: var(--text-color); border-bottom-color: var(--text-color); }
+.feed-compose-box { padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); display: flex; gap: 10px; }
+.feed-av { width: 32px; height: 32px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; flex-shrink: 0; }
+.feed-input-wrap { flex: 1; }
+.feed-input { border-bottom: 1px solid var(--border-color); padding: 3px 0; font-size: 0.9rem; }
+.feed-post-actions { display: flex; justify-content: flex-end; padding-top: 6px; }
+.btn-post { border: 1px solid var(--text-color); padding: 3px 12px; font-size: 0.8rem; }
+.post { padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); display: flex; gap: 10px; }
+.post:hover { background: var(--hover-bg); }
+.post-body { flex: 1; }
+.post-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.post-name { font-size: 0.85rem; font-weight: 500; }
+.post-handle { font-size: 0.8rem; color: var(--text-secondary); }
+.post-time { font-size: 0.75rem; color: var(--text-secondary); }
+.post-text { font-size: 0.9rem; line-height: 1.55; margin-bottom: 8px; }
+.post-acts { display: flex; gap: 14px; }
+.post-act { font-size: 0.75rem; color: var(--text-secondary); }
+.post-act:hover { color: var(--cta-color); opacity: 1; }
+.community-aside { width: 240px; flex-shrink: 0; padding: 1.5rem; }
+.aside-section { margin-bottom: 1.5rem; }
+.aside-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 8px; }
+.trending-row { padding: 5px 0; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+.trending-row:last-child { border-bottom: none; }
+.trending-name { font-size: 0.85rem; font-weight: 500; }
+.trending-sub { font-size: 0.75rem; color: var(--text-secondary); }
+.who-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.who-row:hover { opacity: 0.7; }
+.who-name { font-size: 0.85rem; font-weight: 500; }
+.who-role { font-size: 0.75rem; color: var(--text-secondary); }
+
+/* ─── INVITE MODAL ───────────────────────────────────────── */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 500; align-items: center; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--bg-color); border: 1px solid var(--border-color); padding: 2rem; width: 440px; max-width: 90vw; }
+.modal-title { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+.modal-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
+.modal-search-input { width: 100%; border: 1px solid var(--border-color); padding: 6px 10px; font-size: 0.9rem; background: var(--bg-color); color: var(--text-color); margin-bottom: 0.75rem; }
+.modal-result { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); }
+.modal-result:last-child { border-bottom: none; }
+.modal-res-left { display: flex; align-items: center; gap: 8px; }
+.modal-res-name { font-size: 0.85rem; font-weight: 500; }
+.modal-res-role { font-size: 0.75rem; color: var(--text-secondary); }
+.btn-inv-sm { font-size: 0.75rem; border: 1px solid var(--cta-color); color: var(--cta-color); padding: 2px 8px; }
+.modal-cancel { margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ─── MISC ───────────────────────────────────────────────── */
+.back-bar { padding: 6px 4rem; border-bottom: 1px solid var(--border-color); }
+.back-bar button { font-size: 0.8rem; color: var(--text-secondary); }
+.back-bar button:hover { color: var(--text-color); opacity: 1; }
+.dot-sep { color: var(--text-secondary); margin: 0 4px; }
+
+footer {
+  margin-top: 8rem; padding: 2rem 4rem;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary); font-size: 0.85rem;
+}
+
+/* ─── UNIVERSAL HOVER INVERT ─────────────────────────────── */
+.btn-secondary:hover, .btn-primary:hover, .btn-danger:hover,
+.btn-new:hover, .theme-btn:hover, .nav-search-btn:hover,
+.btn-invite:hover, .btn-edit:hover, .btn-invite-full:hover,
+.btn-publish:hover, .btn-draft:hover, .btn-post:hover,
+.btn-join:hover, .btn-inv-sm:hover, .cat-arr:hover,
+.cat-pill:hover, .add-inline:hover, .open-btn:hover,
+.role-row:hover, .team-slot.open:hover {
+  background: var(--text-color) !important;
+  color: var(--bg-color) !important;
+  border-color: var(--text-color) !important;
+  opacity: 1 !important;
+}
+.btn-primary:hover { background: var(--bg-color) !important; color: var(--text-color) !important; }
+.cat-pill.active { background: var(--text-color); color: var(--bg-color); border-color: var(--text-color); }
+.cat-pill.active:hover { background: var(--bg-color) !important; color: var(--text-color) !important; }
+
+
+.location-field {
+  outline: none;
+}
+body.profile-edit .location-field {
+  cursor: pointer;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 1px;
+  transition: background 0.15s;
+}
+body.profile-edit .location-field:hover {
+  background: var(--hover-bg);
+}
+body:not(.profile-edit) .location-field { cursor: default; pointer-events: none; }
+
+/* ─── LOCATION PICKER MODAL ─────────────────────────────── */
+.location-modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.location-modal-bg.open { display: flex; }
+.location-modal {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 480px; max-width: 90vw;
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.location-modal-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.location-modal-title { font-size: 1rem; font-weight: 600; margin-bottom: 4px; }
+.location-modal-sub { font-size: 0.8rem; color: var(--text-secondary); }
+.location-search {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin-top: 12px;
+  outline: none;
+}
+.location-search:focus { border-color: var(--text-color); }
+.location-map {
+  height: 240px; flex-shrink: 0;
+  background: var(--hover-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+#world-map-svg { color: var(--text-color); }
+#world-map-land path {
+  fill: var(--text-color);
+  fill-opacity: 0.18;
+  stroke: var(--text-color);
+  stroke-opacity: 0.35;
+  stroke-width: 0.4;
+}
+#world-map-pin { transition: cx 0.3s ease, cy 0.3s ease; }
+.location-pin-label {
+  position: absolute; left: 50%; bottom: 12px;
+  transform: translateX(-50%);
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  z-index: 2;
+}
+.location-results {
+  flex: 1; overflow-y: auto;
+  padding: 8px 0;
+}
+.location-result {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 1.5rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.1s;
+}
+.location-result:hover { background: var(--hover-bg); }
+.location-result.selected { background: var(--hover-bg); }
+.location-result-flag {
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.location-result-text { flex: 1; min-width: 0; }
+.location-result-name { font-weight: 500; }
+.location-result-region { font-size: 0.75rem; color: var(--text-secondary); }
+.location-modal-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.location-empty {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────────────────────
+     SCREEN: HOME
+───────────────────────────────────────────────────────────── -->
+<div class="screen active" id="s-home">
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <div class="logo" onclick="go('s-home')">Project Dakdori.</div>
+      <div class="nav-center">
+        <div class="search-row">
+          <div class="search-row-inner">
+            <div class="search-box-wrap" id="main-search-wrap">
+              <span class="search-icon-slot">📖</span>
+              <div class="search-box">
+                <input type="text" id="search-q" placeholder="Search" onkeydown="if(event.key==='Enter') doSearch()" onfocus="document.getElementById('main-search-wrap').classList.add('focused')" onblur="document.getElementById('main-search-wrap').classList.remove('focused')" />
+              </div>
+            </div>
+            <button class="nav-search-btn" onclick="doSearch()">Search</button>
+          </div>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="theme-btn" id="theme-lbl" onclick="toggleTheme()">light</button>
+        <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+        <div class="avatar-nav" onclick="go('s-profile')">YK</div>
+      </div>
+    </nav>
+    <div class="chip-bar">
+      <div class="cat-strip-wrap">
+        <button class="cat-arr hidden" id="cat-arr-l" onclick="scrollCats(-1)">‹</button>
+        <div class="cat-strip at-start" id="cat-strip">
+          <div class="cat-pill active" onclick="filterField(this,'all')">All</div>
+          <div class="cat-pill" onclick="filterField(this,'design')">Design</div>
+          <div class="cat-pill" onclick="filterField(this,'development')">Development</div>
+          <div class="cat-pill" onclick="filterField(this,'film')">Film</div>
+          <div class="cat-pill" onclick="filterField(this,'photography')">Photography</div>
+          <div class="cat-pill" onclick="filterField(this,'music')">Music</div>
+          <div class="cat-pill" onclick="filterField(this,'writing')">Writing</div>
+          <div class="cat-pill" onclick="filterField(this,'illustration')">Illustration</div>
+          <div class="cat-pill" onclick="filterField(this,'marketing')">Marketing</div>
+          <div class="cat-pill" onclick="filterField(this,'research')">Research</div>
+          <div class="cat-pill" onclick="filterField(this,'architecture')">Architecture</div>
+          <div class="cat-pill" onclick="filterField(this,'fashion')">Fashion</div>
+          <div class="cat-pill" onclick="filterField(this,'recent')">Recently uploaded</div>
+          <div class="cat-pill" onclick="filterField(this,'viewed')">Viewed</div>
+          <div class="cat-pill" onclick="filterField(this,'recommended')">For you</div>
+        </div>
+        <button class="cat-arr" id="cat-arr-r" onclick="scrollCats(1)">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-toggle"><button onclick="toggleSB()">≡</button></div>
+      <div class="sb-section">
+        <div class="sb-label">Browse</div>
+        <div class="sb-item active" onclick="go('s-home')"><span>◫</span><span>Home</span></div>
+        <div class="sb-item" onclick="go('s-profile')"><span>○</span><span>My profile</span></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Fields</div>
+        <div class="sb-item" onclick="openCommunity('Design')"><span>□</span><span>Design</span></div>
+        <div class="sb-item" onclick="openCommunity('Development')"><span>□</span><span>Development</span></div>
+        <div class="sb-item" onclick="openCommunity('Film')"><span>□</span><span>Film</span></div>
+        <div class="sb-item" onclick="openCommunity('Photography')"><span>□</span><span>Photography</span></div>
+        <div class="sb-item" onclick="openCommunity('Music')"><span>□</span><span>Music</span></div>
+        <div class="sb-item" onclick="openCommunity('Writing')"><span>□</span><span>Writing</span></div>
+        <div class="sb-item" onclick="openCommunity('Illustration')"><span>□</span><span>Illustration</span></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Create</div>
+        <div class="sb-item" onclick="go('s-compose')"><span>+</span><span>New project</span></div>
+      </div>
+    </aside>
+
+    <div class="content">
+      <div class="section-label" id="grid-lbl">Recommended for you</div>
+      <div class="projects-grid" id="home-grid"></div>
+      <div id="scroll-sentinel" style="display:flex;align-items:center;justify-content:center;padding:2rem 0;font-size:0.8rem;color:var(--text-secondary);"></div>
+      <footer>© DAKDORI — This paper is the official form of Project DAKDORI External Communication Efficiency Team.</footer>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────
+     SCREEN: PROFILE
+───────────────────────────────────────────────────────────── -->
+<div class="screen" id="s-profile">
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <div class="logo" onclick="go('s-home')">Project Dakdori.</div>
+      <div class="nav-center">
+        <div class="search-row">
+          <div class="search-row-inner"><div class="search-box-wrap" onfocusin="this.classList.add('focused')" onfocusout="this.classList.remove('focused')"><span class="search-icon-slot">📖</span><div class="search-box"><input type="text" placeholder="Search" /></div></div><button class="nav-search-btn">Search</button></div>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="theme-btn" onclick="toggleTheme()">light</button>
+        <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+        <div class="avatar-nav" onclick="go('s-profile')">YK</div>
+      </div>
+    </nav>
+  </div>
+  <div class="back-bar"><button onclick="profileBackButton()" id="profile-back-btn">← Back</button> <span class="profile-mode-badge" id="profile-mode-badge">My profile · read mode</span></div>
+  <div class="profile-cover">
+    <button class="cover-edit">Change cover</button>
+  </div>
+  <div class="profile-body-wrap">
+    <div class="profile-header">
+      <div class="profile-av-large">
+        <span id="prof-av-init">YK</span>
+        <span class="av-edit" title="Change avatar">✎</span>
+      </div>
+      <div class="profile-id">
+        <div class="profile-name" contenteditable="false" data-field="name">Yeon Kim</div>
+        <div class="profile-handle" contenteditable="false" data-field="handle">@yeonkim</div>
+        <div class="profile-headline" contenteditable="false" data-field="headline">Visual communicator · Brand identity & motion design</div>
+        <div class="profile-meta-row">
+          <span>📍 <span class="location-field" data-field="location" onclick="openLocationPicker(this)">Seoul, KR</span></span>
+          <span>🕐 <span contenteditable="false" data-field="availability">Available for collaboration</span></span>
+          <span>🌐 <span contenteditable="false" data-field="website">yeonkim.work</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-actions" id="profile-actions-read">
+      <button class="btn-primary" onclick="openInvite()">+ Invite to collaborate</button>
+      <button class="btn-secondary">Follow</button>
+      <button class="btn-secondary">Message</button>
+      <button class="btn-secondary" onclick="toggleProfileEdit(true)">Edit profile</button>
+      <button class="btn-secondary" onclick="toggleProfileView()">View as visitor</button>
+    </div>
+    <div class="profile-actions" id="profile-actions-edit" style="display:none;">
+      <button class="btn-primary" onclick="saveProfile()">Save changes</button>
+      <button class="btn-secondary" onclick="cancelProfile()">Cancel</button>
+      <button class="btn-secondary" onclick="toggleProfileView()">Preview</button>
+    </div>
+
+    <div class="profile-stats-row">
+      <div class="profile-stat-card"><strong>14</strong><span>projects</span></div>
+      <div class="profile-stat-card"><strong>312</strong><span>followers</span></div>
+      <div class="profile-stat-card"><strong>88</strong><span>following</span></div>
+      <div class="profile-stat-card"><strong>27</strong><span>collaborations</span></div>
+    </div>
+
+    <div class="profile-tabs">
+      <div class="p-tab active" onclick="switchProfileTab(this,'tab-projects')">Projects</div>
+      <div class="p-tab" onclick="switchProfileTab(this,'tab-about')">About</div>
+      <div class="p-tab" onclick="switchProfileTab(this,'tab-experience')">Experience</div>
+      <div class="p-tab" onclick="switchProfileTab(this,'tab-reviews')">Reviews</div>
+    </div>
+
+    <!-- ── Projects tab ── -->
+    <div class="profile-tab-content active" id="tab-projects">
+      <div class="projects-grid" id="profile-grid"></div>
+    </div>
+
+    <!-- ── About tab ── -->
+    <div class="profile-tab-content" id="tab-about">
+      <div class="section-title">About <span class="add-inline" onclick="addAboutField()">+ Add field</span></div>
+      <div class="about-bio" contenteditable="false" data-field="bio">Independent designer working at the intersection of brand identity, editorial design, and motion. Five years of practice across publishing, film, and cultural institutions in Seoul. Currently exploring how typographic systems behave in time — variable fonts driven by motion, sound, and reader behavior. Open to commissioned work, residencies, and long-form collaborations.</div>
+
+      <div class="about-grid" id="about-grid">
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Pronouns</div>
+          <div class="about-block-value" contenteditable="false">she/her</div>
+        </div>
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Languages</div>
+          <div class="about-block-value" contenteditable="false">Korean (native), English (fluent), Japanese (basic)</div>
+        </div>
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Available for</div>
+          <div class="about-block-value" contenteditable="false">Brand identity, editorial design, motion direction, art direction, mentorship</div>
+        </div>
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Rates</div>
+          <div class="about-block-value" contenteditable="false">Project-based · Inquire for current availability</div>
+        </div>
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Education</div>
+          <div class="about-block-value" contenteditable="false">SADI Graphic Design, 2019</div>
+        </div>
+        <div class="about-block">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="about-block-label">Based in</div>
+          <div class="about-block-value location-field" onclick="openLocationPicker(this)">Seoul, Republic of Korea</div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+      <div class="section-title">Skills <span class="add-inline" onclick="addTag('skills-grid')">+ Add</span></div>
+      <div class="tag-grid" id="skills-grid">
+        <span class="tag-chip">Brand identity <span class="tag-x">×</span></span>
+        <span class="tag-chip">Motion design <span class="tag-x">×</span></span>
+        <span class="tag-chip">Typography <span class="tag-x">×</span></span>
+        <span class="tag-chip">Editorial design <span class="tag-x">×</span></span>
+        <span class="tag-chip">Art direction <span class="tag-x">×</span></span>
+        <span class="tag-chip">Illustration <span class="tag-x">×</span></span>
+        <span class="tag-chip">Variable fonts <span class="tag-x">×</span></span>
+      </div>
+
+      <div class="section-title" style="margin-top:1.5rem;">Tools <span class="add-inline" onclick="addTag('tools-grid')">+ Add</span></div>
+      <div class="tag-grid" id="tools-grid">
+        <span class="tag-chip">Figma <span class="tag-x">×</span></span>
+        <span class="tag-chip">After Effects <span class="tag-x">×</span></span>
+        <span class="tag-chip">Cavalry <span class="tag-x">×</span></span>
+        <span class="tag-chip">Glyphs <span class="tag-x">×</span></span>
+        <span class="tag-chip">Cinema 4D <span class="tag-x">×</span></span>
+      </div>
+    </div>
+
+    <!-- ── Experience tab ── -->
+    <div class="profile-tab-content" id="tab-experience">
+      <div class="section-title">Experience <span class="add-inline" onclick="addExperience('exp-list')">+ Add experience</span></div>
+      <div class="experience-list" id="exp-list">
+        <div class="experience-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="experience-period" contenteditable="false">2023 — present</div>
+          <div class="experience-detail">
+            <div class="experience-role" contenteditable="false">Independent designer</div>
+            <div class="experience-org" contenteditable="false">Self-employed, Seoul</div>
+            <div class="experience-desc" contenteditable="false">Brand identity and editorial work for cultural institutions, independent publishers, and film studios. Selected clients include MMCA, AGI Society Korea, and several independent galleries.</div>
+          </div>
+        </div>
+        <div class="experience-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="experience-period" contenteditable="false">2021 — 2023</div>
+          <div class="experience-detail">
+            <div class="experience-role" contenteditable="false">Senior designer</div>
+            <div class="experience-org" contenteditable="false">Studio fnt</div>
+            <div class="experience-desc" contenteditable="false">Led identity systems for cultural and editorial clients. Published two books with the studio. Mentored two junior designers through their first year of practice.</div>
+          </div>
+        </div>
+        <div class="experience-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="experience-period" contenteditable="false">2019 — 2021</div>
+          <div class="experience-detail">
+            <div class="experience-role" contenteditable="false">Designer</div>
+            <div class="experience-org" contenteditable="false">Workroom Press</div>
+            <div class="experience-desc" contenteditable="false">Editorial and book design for Korean and translated literary titles. Worked closely with editors and authors on full-spectrum publication design.</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-divider"></div>
+      <div class="section-title">Education <span class="add-inline" onclick="addExperience('edu-list')">+ Add education</span></div>
+      <div class="experience-list" id="edu-list">
+        <div class="experience-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="experience-period" contenteditable="false">2015 — 2019</div>
+          <div class="experience-detail">
+            <div class="experience-role" contenteditable="false">BFA, Graphic Design</div>
+            <div class="experience-org" contenteditable="false">Samsung Art and Design Institute (SADI)</div>
+            <div class="experience-desc" contenteditable="false">Graduation project: <em>Type as time</em>, an exploration of variable typography responding to time-of-day signals. Awarded Director's Mention.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Reviews tab ── -->
+    <div class="profile-tab-content" id="tab-reviews">
+      <div class="section-title">Endorsements & reviews</div>
+      <div class="review-list">
+        <div class="review-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="review-header">
+            <div class="review-av">JL</div>
+            <div>
+              <div class="review-author">Junho Lim</div>
+              <div class="review-meta">Film director · collaborated on <em>Hangang dusk</em></div>
+            </div>
+          </div>
+          <div class="review-text">Yeon translated the visual language of the film into a complete identity in two weeks — title sequences, festival materials, social cuts. The motion direction in particular gave the project a coherent presence. Direct, fast, exact.</div>
+        </div>
+        <div class="review-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="review-header">
+            <div class="review-av">SC</div>
+            <div>
+              <div class="review-author">Sori Cha</div>
+              <div class="review-meta">Creative developer · collaborated on <em>Generative identity system</em></div>
+            </div>
+          </div>
+          <div class="review-text">Rare to find a designer who can specify the rules behind a variable identity, not just the artifacts. Yeon does both, and explains decisions clearly enough that engineers and clients land in the same room.</div>
+        </div>
+        <div class="review-item">
+          <span class="item-x" onclick="this.parentElement.remove()">×</span>
+          <div class="review-header">
+            <div class="review-av">AJ</div>
+            <div>
+              <div class="review-author">Ara Jung</div>
+              <div class="review-meta">Writer · commissioned cover design</div>
+            </div>
+          </div>
+          <div class="review-text">Designed the cover for my first essay collection. Read the manuscript twice before showing me anything. The result felt like the book had always looked like that.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────
+     SCREEN: PROJECT DETAIL
+───────────────────────────────────────────────────────────── -->
+<div class="screen" id="s-detail">
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <div class="logo" onclick="go('s-home')">Project Dakdori.</div>
+      <div class="nav-center">
+        <div class="search-row">
+          <div class="search-row-inner"><div class="search-box-wrap" onfocusin="this.classList.add('focused')" onfocusout="this.classList.remove('focused')"><span class="search-icon-slot">📖</span><div class="search-box"><input type="text" placeholder="Search" /></div></div><button class="nav-search-btn">Search</button></div>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="theme-btn" onclick="toggleTheme()">light</button>
+        <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+        <div class="avatar-nav" onclick="go('s-profile')">YK</div>
+      </div>
+    </nav>
+  </div>
+  <div class="back-bar"><button onclick="go('s-home')">← Back to home</button></div>
+  <div class="detail-layout">
+    <div class="detail-main">
+      <div class="detail-visual" id="d-visual">No media uploaded</div>
+      <div class="detail-info">
+        <div class="detail-title" id="d-title">–</div>
+        <div class="detail-meta">
+          <span id="d-author">–</span>
+          <span class="dot-sep">·</span>
+          <span id="d-field">–</span>
+          <span class="dot-sep">·</span>
+          <span style="color:var(--text-secondary);font-size:0.8rem;">3 days ago</span>
+
+        </div>
+        <p class="detail-desc" id="d-desc">–</p>
+        <div class="detail-section-label">Team & open roles</div>
+        <div class="team-slots" id="d-slots"></div>
+        <div style="margin-top:1rem;" id="d-tags"></div>
+      </div>
+    </div>
+    <aside class="detail-sidebar">
+      <div class="author-block" onclick="go('s-profile')">
+        <div class="author-row">
+          <div class="author-av" id="d-av">–</div>
+          <div>
+            <div class="author-name" id="d-anm">–</div>
+            <div class="author-role-text" id="d-arole">–</div>
+          </div>
+        </div>
+        <div class="author-bio-text" id="d-abio">–</div>
+        <button class="btn-invite-full" onclick="event.stopPropagation();openInvite()">+ Invite to collaborate</button>
+      </div>
+      <div class="related-label">More from this field</div>
+      <div id="d-related"></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────
+     SCREEN: COMPOSE
+───────────────────────────────────────────────────────────── -->
+<div class="screen" id="s-compose">
+  <div class="nav-wrapper">
+    <nav class="nav">
+    <div class="logo" onclick="go('s-home')">Project Dakdori.</div>
+    <div class="nav-center"></div>
+    <div class="nav-right">
+      <button class="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+      <div class="avatar-nav" onclick="go('s-profile')">YK</div>
+    </div>
+    </nav>
+  </div>
+  <div class="back-bar"><button onclick="go('s-home')">← Discard</button></div>
+  <div class="compose-wrap">
+    <div class="compose-main">
+      <input type="text" class="compose-title" placeholder="Project title" />
+      <div class="compose-toolbar">
+        <button class="tb-btn">B</button>
+        <button class="tb-btn"><em>I</em></button>
+        <button class="tb-btn">H1</button>
+        <button class="tb-btn">H2</button>
+        <button class="tb-btn">—</button>
+        <button class="tb-btn">[ ]</button>
+      </div>
+      <textarea class="compose-body" rows="8" placeholder="Describe your project. What are you building? Who do you need?"></textarea>
+      <div class="compose-drop">
+        Drop media here, or click to upload<br>
+        <span style="font-size:0.75rem;color:var(--text-secondary);">Images, video, PDF — max 50MB</span>
+      </div>
+      <div class="compose-actions">
+        <button class="btn-publish" onclick="go('s-home')">Publish</button>
+        <button class="btn-draft">Save draft</button>
+      </div>
+    </div>
+    <aside class="compose-side">
+      <div class="cs-section">
+        <div class="cs-label">Field</div>
+        <select class="cs-select">
+          <option>Select field…</option>
+          <option>Design</option><option>Development</option><option>Film</option>
+          <option>Photography</option><option>Music</option><option>Writing</option>
+          <option>Illustration</option><option>Marketing</option>
+        </select>
+      </div>
+      <div class="cs-section">
+        <div class="cs-label">Tags</div>
+        <input class="cs-input" type="text" placeholder="Add tags, press Enter…" />
+      </div>
+      <div class="cs-section">
+        <div class="cs-label">Roles needed</div>
+        <div class="role-row">+ Cinematographer</div>
+        <div class="role-row">+ Sound designer</div>
+        <div class="role-row">+ Editor</div>
+        <div class="role-row role-add">+ Add role</div>
+      </div>
+      <div class="cs-section">
+        <div class="cs-label">Visibility</div>
+        <select class="cs-select">
+          <option>Public</option>
+          <option>Followers only</option>
+          <option>Invite only</option>
+        </select>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────
+     SCREEN: COMMUNITY
+───────────────────────────────────────────────────────────── -->
+<div class="screen" id="s-community">
+  <div class="nav-wrapper">
+    <nav class="nav">
+    <div class="logo" onclick="go('s-home')">Project Dakdori.</div>
+    <div class="nav-center">
+      <div class="search-row">
+        <div class="search-row-inner"><div class="search-box-wrap" onfocusin="this.classList.add('focused')" onfocusout="this.classList.remove('focused')"><span class="search-icon-slot">📖</span><div class="search-box"><input type="text" placeholder="Search" /></div></div><button class="nav-search-btn">Search</button></div>
+        <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-new" onclick="go('s-compose')">+ New project</button>
+      <div class="avatar-nav" onclick="go('s-profile')">YK</div>
+    </div>
+    </nav>
+  </div>
+  <div class="back-bar"><button onclick="go('s-home')">← Back to home</button></div>
+  <div class="community-wrap">
+    <div class="community-feed">
+      <div class="community-head">
+        <div class="community-hero">
+          <div class="community-icon" id="c-icon">□</div>
+          <div>
+            <div class="community-title" id="c-name">–</div>
+            <div class="community-members" id="c-members">–</div>
+          </div>
+          <button class="btn-join">Join</button>
+        </div>
+        <div class="community-desc" id="c-desc">–</div>
+        <div class="feed-tabs">
+          <div class="feed-tab active">Feed</div>
+          <div class="feed-tab">Projects</div>
+          <div class="feed-tab">Members</div>
+        </div>
+      </div>
+      <div class="feed-compose-box">
+        <div class="feed-av">YK</div>
+        <div class="feed-input-wrap">
+          <textarea class="feed-input" rows="2" placeholder="Share something with this community…"></textarea>
+          <div class="feed-post-actions"><button class="btn-post">Post</button></div>
+        </div>
+      </div>
+      <div id="c-posts"></div>
+    </div>
+    <aside class="community-aside">
+      <div class="aside-section">
+        <div class="aside-label">Trending topics</div>
+        <div id="c-trending"></div>
+      </div>
+      <div class="aside-section">
+        <div class="aside-label">People to follow</div>
+        <div id="c-who"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ─── LOCATION PICKER MODAL ─────────────────────────────── -->
+<div class="location-modal-bg" id="location-modal">
+  <div class="location-modal">
+    <div class="location-modal-header">
+      <div class="location-modal-title">Set location</div>
+      <div class="location-modal-sub">Search and select a city</div>
+      <input type="text" class="location-search" id="location-search-input" placeholder="Search city, country…" oninput="filterLocations()" />
+    </div>
+    <div class="location-map" id="location-map">
+      <svg id="world-map-svg" viewBox="0 0 720 360" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+        <g id="world-map-land"></g>
+        <circle id="world-map-pin" cx="-100" cy="-100" r="5" fill="var(--text-color)" stroke="var(--bg-color)" stroke-width="2" style="display:none;"/>
+      </svg>
+      <div class="location-pin-label" id="location-pin-label">No location selected</div>
+    </div>
+    <div class="location-results" id="location-results"></div>
+    <div class="location-modal-actions">
+      <button class="btn-secondary" onclick="closeLocationPicker()">Cancel</button>
+      <button class="btn-primary" id="location-confirm" onclick="confirmLocation()" disabled>Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── INVITE MODAL ──────────────────────────────────────── -->
+<div class="modal-bg" id="invite-modal">
+  <div class="modal">
+    <div class="modal-title">Invite to project</div>
+    <div class="modal-sub">Search by name, role, or skill to find collaborators</div>
+    <input class="modal-search-input" type="text" placeholder="Search name or role…" />
+    <div id="modal-list"></div>
+    <button class="modal-cancel" onclick="closeInvite()">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ─── DATA ──────────────────────────────────────────────── */
+const CARDS = [
+  { id:1, daysAgo:3, title:"Type specimen no. 3", author:"Yeon Kim", initials:"YK", field:"design", tags:["typography","editorial","zine"], desc:"A zine exploring letterform abstraction through cut-and-paste composition. Looking for a printer partner.", views:312, likes:44 },
+  { id:2, daysAgo:1, title:"Short film: Hangang dusk", author:"Junho Lim", initials:"JL", field:"film", tags:["short film","16mm","seoul"], desc:"16mm documentary short about dusk fishers on the Han River. Open for sound designer and colorist.", views:891, likes:102 },
+  { id:3, daysAgo:5, title:"Generative identity system", author:"Sori Cha", initials:"SC", field:"development", tags:["creative code","branding","p5.js"], desc:"Identity system where every application is uniquely generated from a single seed. Seeking brand strategist.", views:544, likes:78 },
+  { id:4, daysAgo:8, title:"Portolan: ambient album", author:"Min Baek", initials:"MB", field:"music", tags:["ambient","field recording","release"], desc:"10-track ambient record built entirely from Han River field recordings. Seeking visual artist for cover art.", views:229, likes:35 },
+  { id:5, daysAgo:2, title:"Urban flora photography", author:"Ji Seo", initials:"JS", field:"photography", tags:["photography","urban","flora"], desc:"Photo series documenting invasive species growing in Seoul's built environment.", views:670, likes:91 },
+  { id:6, daysAgo:14, title:"Dakdori editorial system", author:"Yeon Kim", initials:"YK", field:"design", tags:["design system","type","publication"], desc:"Open-source editorial design system built on flat color, sharp type, and zero decoration.", views:1203, likes:156 },
+  { id:7, daysAgo:6, title:"Novel: The commute", author:"Ara Jung", initials:"AJ", field:"writing", tags:["fiction","serialized","urban"], desc:"Serialized novel published on Dakdori. 14 chapters posted. Seeking illustrator for chapter headers.", views:445, likes:57 },
+  { id:8, daysAgo:1, title:"Character sheet: vol. 2", author:"Doh Lee", initials:"DL", field:"illustration", tags:["character design","webtoon","collab"], desc:"Second volume of worldbuilding character sheets for an original IP. Seeking webtoon writer.", views:788, likes:112 },
+  { id:9, daysAgo:10, title:"AR wayfinding prototype", author:"Sori Cha", initials:"SC", field:"development", tags:["AR","UX","prototype"], desc:"Augmented reality indoor navigation prototype built in Unity. Open for UX researcher.", views:334, likes:48 },
+];
+
+const PEOPLE = [
+  { name:"Junho Lim", initials:"JL", role:"Film director", bio:"Independent filmmaker. 16mm and DV." },
+  { name:"Sori Cha", initials:"SC", role:"Creative developer", bio:"Generative systems & creative code." },
+  { name:"Min Baek", initials:"MB", role:"Composer / Sound designer", bio:"Field recording, ambient, post-production." },
+  { name:"Ji Seo", initials:"JS", role:"Photographer", bio:"Urban documentation and still life." },
+  { name:"Ara Jung", initials:"AJ", role:"Writer", bio:"Fiction, serialized narrative." },
+  { name:"Doh Lee", initials:"DL", role:"Illustrator", bio:"Character design & world-building." },
+  { name:"Yeon Kim", initials:"YK", role:"Visual designer", bio:"Brand identity & motion design." },
+];
+
+const COMMUNITIES = {
+  Design: { icon:"◻", members:"2,341", desc:"Brand identity, UI/UX, editorial, motion — all things visual design.",
+    posts:[ { name:"Sori Cha", handle:"@soricha", time:"2h", text:"Just shipped a generative type system that produces 10,000 unique specimens from one typeface. Each run is a different world.", likes:34, replies:8 }, { name:"Yeon Kim", handle:"@yeonkim", time:"5h", text:"Why does every design system end up looking the same? Dakdori's system is deliberately anti-grid. Interested in others who resist the template.", likes:61, replies:17 } ], trending:["#designsystem","#branding","#typography"], who:["Sori Cha","Ji Seo"] },
+  Development: { icon:"{ }", members:"3,110", desc:"Creative code, tools, web, open source.",
+    posts:[ { name:"Sori Cha", handle:"@soricha", time:"1h", text:"Wrote a p5.js renderer that turns any SVG into a hand-drawn ink sketch. Drop a file, get art. Open source next week.", likes:88, replies:22 } ], trending:["#creativecode","#openSource","#p5js"], who:["Sori Cha","Min Baek"] },
+  Film: { icon:"▷", members:"1,876", desc:"Short films, documentary, experimental cinema. From script to screen.",
+    posts:[ { name:"Junho Lim", handle:"@junholim", time:"4h", text:"Day 3 of shooting on the Han River. The light at 6:15 AM is unlike anything I've captured on digital. 16mm is non-negotiable.", likes:54, replies:11 }, { name:"Ara Jung", handle:"@arajung", time:"1d", text:"Looking for a director to adapt one chapter of 'The Commute' as a short. DM me if interested.", likes:29, replies:6 } ], trending:["#shortfilm","#16mm","#documentary"], who:["Junho Lim","Ara Jung"] },
+  Photography: { icon:"◎", members:"2,090", desc:"Documentary, portrait, conceptual — photography in all forms.",
+    posts:[ { name:"Ji Seo", handle:"@jiseo", time:"3h", text:"New batch from the urban flora series. Mugwort growing through cracked asphalt next to Yeongdeungpo station. Nature is patient.", likes:72, replies:13 } ], trending:["#documentary","#urban","#analogfilm"], who:["Ji Seo","Yeon Kim"] },
+  Music: { icon:"♩", members:"1,543", desc:"Composers, producers, sound designers. From ambient to experimental.",
+    posts:[ { name:"Min Baek", handle:"@minbaek", time:"6h", text:"Track 7 of Portolan is up. 11 minutes of filtered river noise. Mastering is done. Album drops next month.", likes:41, replies:9 } ], trending:["#ambient","#fieldrecording","#release"], who:["Min Baek","Junho Lim"] },
+  Writing: { icon:"§", members:"998", desc:"Fiction, non-fiction, criticism, poetry. Words first.",
+    posts:[ { name:"Ara Jung", handle:"@arajung", time:"2h", text:"Chapter 15 of The Commute is live. The protagonist finally names what she's been running from. 14 months of serialization and this felt like the turn the whole thing was waiting for.", likes:66, replies:18 } ], trending:["#serialized","#fiction","#publishing"], who:["Ara Jung","Min Baek"] },
+  Illustration: { icon:"△", members:"1,288", desc:"Character design, world-building, editorial art, comics.",
+    posts:[ { name:"Doh Lee", handle:"@dohlee", time:"8h", text:"Volume 2 character sheets are done. 12 characters, 4 factions. Looking for a writer who wants to build this world into a webtoon.", likes:99, replies:31 } ], trending:["#characterdesign","#webtoon","#worldbuilding"], who:["Doh Lee","Ji Seo"] },
+};
+
+/* ─── RENDER CARD ───────────────────────────────────────── */
+function cardHTML(c) {
+  const tagsHTML = c.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+  return `
+    <div class="card-container" ondblclick="flipCard(event,${c.id})" onclick="openDetail(${c.id})">
+      <div class="card" id="card-${c.id}">
+        <div class="card-face card-front">
+          <div class="card-thumb">
+            <span class="card-thumb-initials">${c.initials}</span>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-back-title">${c.title}</div>
+          <div class="card-back-desc">${c.desc}</div>
+          <div class="card-back-meta">${c.author} · ${c.field}</div>
+          <div class="card-back-tags">${tagsHTML}</div>
+          <div class="card-actions">
+            <span></span>
+            <button class="open-btn" onclick="event.stopPropagation();openDetail(${c.id})">Open →</button>
+          </div>
+        </div>
+      </div>
+      <div class="front-text-wrapper has-text" id="ft-${c.id}">
+        <div class="front-text-inner">
+          <div class="front-text">
+            <div class="front-title">${c.title}</div>
+            <div class="front-description">${c.author} · ${c.field}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderGrid(cards, id) {
+  document.getElementById(id).innerHTML = cards.map(cardHTML).join('');
+}
+
+/* ─── CARD FLIP ─────────────────────────────────────────── */
+function flipCard(e, id) {
+  e.stopPropagation();
+  const card = document.getElementById('card-'+id);
+  const ft = document.getElementById('ft-'+id);
+  card.classList.toggle('flip');
+  if (card.classList.contains('flip')) ft.classList.add('flip-hidden');
+  else ft.classList.remove('flip-hidden');
+}
+
+/* ─── OPEN PROJECT DETAIL ───────────────────────────────── */
+function openDetail(id) {
+  const c = ALL_CARDS_POOL.find(x=>x.id===id);
+  if (c && !VIEWED_IDS.includes(id)) VIEWED_IDS.unshift(id);
+  if (!c) return;
+  document.getElementById('d-visual').textContent = c.initials + ' — no media uploaded';
+  document.getElementById('d-title').textContent = c.title;
+  document.getElementById('d-author').textContent = c.author;
+  document.getElementById('d-field').textContent = c.field;
+  document.getElementById('d-desc').textContent = c.desc;
+  document.getElementById('d-tags').innerHTML = c.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+
+  const person = PEOPLE.find(p=>p.name===c.author) || PEOPLE[0];
+  document.getElementById('d-av').textContent = person.initials;
+  document.getElementById('d-anm').textContent = person.name;
+  document.getElementById('d-arole').textContent = person.role;
+  document.getElementById('d-abio').textContent = person.bio;
+
+  const openRoles = ['Sound designer','Colorist','Editor','Animator'].slice(0,2);
+  document.getElementById('d-slots').innerHTML =
+    `<div class="team-slot"><div class="author-av">${c.initials}</div> ${c.author} (lead)</div>` +
+    openRoles.map(r=>`<div class="team-slot open" onclick="openInvite()">+ ${r}</div>`).join('');
+
+  const related = CARDS.filter(x=>x.field===c.field&&x.id!==c.id).slice(0,3);
+  document.getElementById('d-related').innerHTML = related.map(r=>`
+    <div class="related-item" onclick="openDetail(${r.id})">
+      <div class="related-thumb">${r.initials}</div>
+      <div><div class="related-title">${r.title}</div><div class="related-author-name">${r.author}</div></div>
+    </div>`).join('');
+
+  go('s-detail');
+}
+
+/* ─── OPEN COMMUNITY ────────────────────────────────────── */
+function openCommunity(field) {
+  const c = COMMUNITIES[field];
+  if (!c) return;
+  document.getElementById('c-icon').textContent = c.icon;
+  document.getElementById('c-name').textContent = field;
+  document.getElementById('c-members').textContent = c.members + ' members';
+  document.getElementById('c-desc').textContent = c.desc;
+
+  document.getElementById('c-posts').innerHTML = c.posts.map(p=>`
+    <div class="post">
+      <div class="feed-av">${p.name.split(' ').map(w=>w[0]).join('')}</div>
+      <div class="post-body">
+        <div class="post-header">
+          <span class="post-name">${p.name}</span>
+          <span class="post-handle">${p.handle}</span>
+          <span class="post-time">${p.time}</span>
+        </div>
+        <div class="post-text">${p.text}</div>
+        <div class="post-acts">
+          <button class="post-act">↩ ${p.replies}</button>
+          <button class="post-act">↑ ${p.likes}</button>
+          <button class="post-act">⤤ Share</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('c-trending').innerHTML = c.trending.map(t=>`
+    <div class="trending-row"><div class="trending-name">${t}</div><div class="trending-sub">Trending in ${field}</div></div>`).join('');
+
+  document.getElementById('c-who').innerHTML = c.who.map(nm=>{
+    const p = PEOPLE.find(x=>x.name===nm)||{initials:nm.split(' ').map(w=>w[0]).join(''),role:'Creator'};
+    return `<div class="who-row" onclick="go('s-profile')">
+      <div class="author-av">${p.initials}</div>
+      <div><div class="who-name">${nm}</div><div class="who-role">${p.role}</div></div>
+    </div>`;}).join('');
+
+  go('s-community');
+}
+
+/* ─── SEARCH ────────────────────────────────────────────── */
+function doSearch() {
+  const q = (document.getElementById("search-q").value||"").toLowerCase().trim();
+  const results = q ? ALL_CARDS_POOL.filter(c=>
+    c.title.toLowerCase().includes(q)||c.author.toLowerCase().includes(q)||
+    c.tags.some(t=>t.includes(q))||c.field.includes(q)
+  ) : ALL_CARDS_POOL;
+  document.getElementById("grid-lbl").textContent = q ? `Results for "${q}"` : "Recommended for you";
+  renderGridPaged(results);
+  go("s-home");
+}
+
+/* u2500u2500u2500 FILTER u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500 */
+function filterField(el, field) {
+  document.querySelectorAll("#cat-strip .cat-pill").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  let list, label;
+  if (field === 'all') {
+    list = [...ALL_CARDS_POOL];
+    label = 'Recommended for you';
+  } else if (field === 'recent') {
+    list = [...ALL_CARDS_POOL].sort((a,b) => a.daysAgo - b.daysAgo);
+    label = 'Recently uploaded';
+  } else if (field === 'viewed') {
+    list = VIEWED_IDS.length
+      ? VIEWED_IDS.map(id => ALL_CARDS_POOL.find(c=>c.id===id)).filter(Boolean)
+      : [];
+    label = 'Viewed';
+  } else if (field === 'recommended') {
+    const fields = VIEWED_IDS.map(id => ALL_CARDS_POOL.find(c=>c.id===id)).filter(Boolean).map(c=>c.field);
+    const freq = {};
+    fields.forEach(f=>{ freq[f]=(freq[f]||0)+1; });
+    const topField = Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0];
+    list = topField
+      ? [...ALL_CARDS_POOL].sort((a,b)=>((b.field===topField?2:0)+(b.likes||0)*0.01) - ((a.field===topField?2:0)+(a.likes||0)*0.01))
+      : [...ALL_CARDS_POOL].sort((a,b)=>(b.likes||0)-(a.likes||0));
+    label = 'For you';
+  } else {
+    list = ALL_CARDS_POOL.filter(c=>c.field===field);
+    label = field.charAt(0).toUpperCase()+field.slice(1);
+  }
+  document.getElementById("grid-lbl").textContent = label;
+  renderGridPaged(list);
+  go("s-home");
+}
+
+/* ─── INVITE MODAL ──────────────────────────────────────── */
+function openInvite() {
+  document.getElementById('modal-list').innerHTML = PEOPLE.map(p=>`
+    <div class="modal-result">
+      <div class="modal-res-left">
+        <div class="author-av">${p.initials}</div>
+        <div><div class="modal-res-name">${p.name}</div><div class="modal-res-role">${p.role}</div></div>
+      </div>
+      <button class="btn-inv-sm">Invite</button>
+    </div>`).join('');
+  document.getElementById('invite-modal').classList.add('open');
+}
+function closeInvite() { document.getElementById('invite-modal').classList.remove('open'); }
+document.getElementById('invite-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('invite-modal')) closeInvite(); });
+
+/* ─── NAVIGATION ────────────────────────────────────────── */
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ─── SIDEBAR ───────────────────────────────────────────── */
+function toggleSB() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+/* ─── CAT STRIP SCROLL ──────────────────────────────────── */
+function scrollCats(dir) {
+  const strip = document.getElementById('cat-strip');
+  strip.scrollBy({ left: dir * 140, behavior: 'smooth' });
+}
+function updateCatFade() {
+  const strip = document.getElementById('cat-strip');
+  if (!strip) return;
+  const atStart = strip.scrollLeft <= 2;
+  const atEnd = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+  strip.classList.toggle('at-start', atStart);
+  strip.classList.toggle('at-end', atEnd);
+  document.getElementById('cat-arr-l').classList.toggle('hidden', atStart);
+  document.getElementById('cat-arr-r').classList.toggle('hidden', atEnd);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const strip = document.getElementById('cat-strip');
+  if (strip) {
+    strip.addEventListener('scroll', updateCatFade, { passive: true });
+    updateCatFade();
+  }
+});
+
+/* ─── THEME ─────────────────────────────────────────────── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : cur === 'dark' ? 'system' : 'light';
+  html.setAttribute('data-theme', next);
+  document.querySelectorAll('.theme-btn').forEach(b => b.textContent = next);
+}
+function syncThemeLabel() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.querySelectorAll('.theme-btn').forEach(b => b.textContent = cur);
+}
+
+
+
+/* ─── PROFILE EDIT HELPERS ──────────────────────────────── */
+function addTag(gridId) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const span = document.createElement('span');
+  span.className = 'tag-chip';
+  span.innerHTML = '<span contenteditable="true" data-placeholder="New tag" style="outline:none; min-width:40px;">New tag</span> <span class="tag-x" onclick="this.parentElement.remove()">×</span>';
+  grid.appendChild(span);
+  const editable = span.querySelector('[contenteditable]');
+  editable.focus();
+  // select all text inside
+  const range = document.createRange();
+  range.selectNodeContents(editable);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+function addAboutField() {
+  const grid = document.getElementById('about-grid');
+  if (!grid) return;
+  const block = document.createElement('div');
+  block.className = 'about-block';
+  block.innerHTML = `<span class="item-x" onclick="this.parentElement.remove()">×</span><div class="about-block-label" contenteditable="true" style="outline:none;">New field</div><div class="about-block-value" contenteditable="true">Click to edit value</div>`;
+  grid.appendChild(block);
+  const label = block.querySelector('.about-block-label');
+  label.focus();
+  const range = document.createRange();
+  range.selectNodeContents(label);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+function addExperience(listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const item = document.createElement('div');
+  item.className = 'experience-item';
+  item.innerHTML = `
+    <span class="item-x" onclick="this.parentElement.remove()">×</span>
+    <div class="experience-period" contenteditable="true">2025 — present</div>
+    <div class="experience-detail">
+      <div class="experience-role" contenteditable="true">Role / title</div>
+      <div class="experience-org" contenteditable="true">Organization</div>
+      <div class="experience-desc" contenteditable="true">Brief description of what you did and what was achieved.</div>
+    </div>`;
+  list.insertBefore(item, list.firstChild);
+  const role = item.querySelector('.experience-role');
+  role.focus();
+  const range = document.createRange();
+  range.selectNodeContents(role);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+/* ─── TAG → COMMUNITY ROUTING ───────────────────────────── */
+const TAG_TO_COMMUNITY = {
+  'brand identity':'Design','motion design':'Design','typography':'Design','editorial design':'Design',
+  'art direction':'Design','illustration':'Illustration','variable fonts':'Design',
+  'figma':'Design','after effects':'Design','cavalry':'Design','glyphs':'Design','cinema 4d':'Design'
+};
+function tagClickHandler(e) {
+  if (!e.target.classList.contains('tag-chip')) return;
+  if (profileEditMode) return;
+  if (e.target.closest('.tag-x')) return;
+  const text = e.target.firstChild.textContent.trim().toLowerCase();
+  const target = TAG_TO_COMMUNITY[text];
+  if (target) openCommunity(target);
+  else openCommunity('Design');
+}
+
+/* ─── PROFILE MODE & TABS ───────────────────────────────── */
+let profileEditMode = false;
+let profileVisitorView = false;
+let profileSnapshot = null;  // DOM snapshot for cancel restore
+
+function snapshotProfile() {
+  // 모든 contenteditable 요소의 현재 innerHTML을 저장
+  const snap = {};
+  document.querySelectorAll('#s-profile [contenteditable]').forEach((el, i) => {
+    const key = el.dataset.field || ('el_' + i);
+    snap[el.dataset.field ? 'field_' + key : 'idx_' + i] = el.innerHTML;
+    el._snapKey = el.dataset.field ? 'field_' + key : 'idx_' + i;
+  });
+  // about-grid, exp-list, edu-list, skills-grid, tools-grid의 전체 HTML도 저장
+  ['about-grid','exp-list','edu-list','skills-grid','tools-grid','tab-reviews'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) snap['block_' + id] = el.innerHTML;
+  });
+  return snap;
+}
+
+function restoreProfile(snap) {
+  if (!snap) return;
+  // 블록 단위 구조 복원 (항목 추가/삭제 포함)
+  ['about-grid','exp-list','edu-list','skills-grid','tools-grid','tab-reviews'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && snap['block_' + id] !== undefined) el.innerHTML = snap['block_' + id];
+  });
+  // contenteditable 필드 복원
+  document.querySelectorAll('#s-profile [contenteditable]').forEach((el, i) => {
+    const key = el.dataset.field ? 'field_' + el.dataset.field : 'idx_' + i;
+    if (snap[key] !== undefined) el.innerHTML = snap[key];
+  });
+}
+
+function toggleProfileEdit(on) {
+  profileEditMode = on;
+  profileVisitorView = false;
+  if (on) {
+    profileSnapshot = snapshotProfile();  // 편집 시작 시 스냅샷
+  }
+  document.body.classList.toggle('profile-edit', on);
+  document.querySelectorAll('#s-profile [contenteditable]').forEach(el => el.setAttribute('contenteditable', on ? 'true' : 'false'));
+  document.getElementById('profile-actions-read').style.display = on ? 'none' : 'flex';
+  document.getElementById('profile-actions-edit').style.display = on ? 'flex' : 'none';
+  updateProfileBadge();
+}
+function toggleProfileView() {
+  profileVisitorView = !profileVisitorView;
+  const backBtn = document.getElementById('profile-back-btn');
+  if (profileVisitorView) {
+    document.body.classList.remove('profile-edit');
+    document.querySelectorAll('#s-profile [contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+    document.getElementById('profile-actions-read').style.display = 'none';
+    document.getElementById('profile-actions-edit').style.display = 'none';
+    if (backBtn) backBtn.textContent = '← Exit preview';
+  } else {
+    if (backBtn) backBtn.textContent = '← Back';
+    if (profileEditMode) toggleProfileEdit(true);
+    else toggleProfileEdit(false);
+  }
+  updateProfileBadge();
+}
+function profileBackButton() {
+  if (profileVisitorView) {
+    toggleProfileView();
+  } else {
+    go('s-home');
+  }
+}
+function saveProfile() {
+  profileSnapshot = null;  // 스냅샷 폐기 (저장 확정)
+  toggleProfileEdit(false);
+}
+function cancelProfile() {
+  restoreProfile(profileSnapshot);  // 원본 복원
+  profileSnapshot = null;
+  toggleProfileEdit(false);
+}
+function updateProfileBadge() {
+  const b = document.getElementById('profile-mode-badge');
+  if (!b) return;
+  if (profileVisitorView) b.textContent = 'Visitor preview';
+  else if (profileEditMode) b.textContent = 'My profile · edit mode';
+  else b.textContent = 'My profile · read mode';
+}
+function switchProfileTab(el, id) {
+  document.querySelectorAll('#s-profile .p-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+
+
+/* ─── WORLD MAP LOAD (D3 + TopoJSON) ────────────────────── */
+let worldMapLoaded = false;
+async function loadWorldMap() {
+  if (worldMapLoaded) return;
+  if (typeof d3 === 'undefined' || typeof topojson === 'undefined') return;
+  try {
+    const world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json');
+    const land = topojson.feature(world, world.objects.land);
+    // Equirectangular projection mapped to viewBox 720 x 360
+    const projection = d3.geoEquirectangular()
+      .scale(720 / (2 * Math.PI))
+      .translate([360, 180]);
+    const pathGen = d3.geoPath(projection);
+    const g = document.getElementById('world-map-land');
+    g.innerHTML = '';
+    if (land.type === 'FeatureCollection') {
+      land.features.forEach(f => {
+        const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d', pathGen(f));
+        g.appendChild(p);
+      });
+    } else {
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d', pathGen(land));
+      g.appendChild(p);
+    }
+    worldMapLoaded = true;
+  } catch (e) {
+    console.error('World map load failed', e);
+  }
+}
+
+/* ─── LOCATION PICKER ───────────────────────────────────── */
+const MAP_VIEW = { w: 720, h: 360 };
+function lonToX(lon) { return (lon + 180) * MAP_VIEW.w / 360; }
+function latToY(lat) { return (90 - lat) * MAP_VIEW.h / 180; }
+
+const LOCATIONS_RAW = [
+  ['Seoul','Republic of Korea','🇰🇷',37.57,126.98],
+  ['Busan','Republic of Korea','🇰🇷',35.18,129.08],
+  ['Incheon','Republic of Korea','🇰🇷',37.46,126.71],
+  ['Daegu','Republic of Korea','🇰🇷',35.87,128.60],
+  ['Daejeon','Republic of Korea','🇰🇷',36.35,127.38],
+  ['Gwangju','Republic of Korea','🇰🇷',35.16,126.85],
+  ['Jeju','Republic of Korea','🇰🇷',33.50,126.53],
+  ['Tokyo','Japan','🇯🇵',35.68,139.69],
+  ['Osaka','Japan','🇯🇵',34.69,135.50],
+  ['Kyoto','Japan','🇯🇵',35.01,135.77],
+  ['Yokohama','Japan','🇯🇵',35.44,139.64],
+  ['Sapporo','Japan','🇯🇵',43.06,141.35],
+  ['Fukuoka','Japan','🇯🇵',33.59,130.40],
+  ['Nagoya','Japan','🇯🇵',35.18,136.91],
+  ['Beijing','China','🇨🇳',39.90,116.41],
+  ['Shanghai','China','🇨🇳',31.23,121.47],
+  ['Guangzhou','China','🇨🇳',23.13,113.26],
+  ['Shenzhen','China','🇨🇳',22.54,114.06],
+  ['Chengdu','China','🇨🇳',30.57,104.07],
+  ["Xi'an",'China','🇨🇳',34.34,108.94],
+  ['Hangzhou','China','🇨🇳',30.27,120.15],
+  ['Hong Kong','China','🇨🇳',22.32,114.17],
+  ['Macau','China','🇲🇴',22.20,113.54],
+  ['Taipei','Taiwan','🇹🇼',25.03,121.57],
+  ['Kaohsiung','Taiwan','🇹🇼',22.63,120.30],
+  ['Ulaanbaatar','Mongolia','🇲🇳',47.92,106.92],
+  ['Singapore','Singapore','🇸🇬',1.35,103.82],
+  ['Kuala Lumpur','Malaysia','🇲🇾',3.14,101.69],
+  ['Bangkok','Thailand','🇹🇭',13.76,100.50],
+  ['Chiang Mai','Thailand','🇹🇭',18.79,98.99],
+  ['Hanoi','Vietnam','🇻🇳',21.03,105.85],
+  ['Ho Chi Minh City','Vietnam','🇻🇳',10.82,106.63],
+  ['Manila','Philippines','🇵🇭',14.60,120.98],
+  ['Cebu','Philippines','🇵🇭',10.32,123.89],
+  ['Jakarta','Indonesia','🇮🇩',-6.21,106.85],
+  ['Bali','Indonesia','🇮🇩',-8.41,115.19],
+  ['Yogyakarta','Indonesia','🇮🇩',-7.80,110.37],
+  ['Phnom Penh','Cambodia','🇰🇭',11.56,104.92],
+  ['Vientiane','Laos','🇱🇦',17.97,102.61],
+  ['Yangon','Myanmar','🇲🇲',16.87,96.20],
+  ['Mumbai','India','🇮🇳',19.08,72.88],
+  ['Delhi','India','🇮🇳',28.61,77.21],
+  ['Bangalore','India','🇮🇳',12.97,77.59],
+  ['Chennai','India','🇮🇳',13.08,80.27],
+  ['Kolkata','India','🇮🇳',22.57,88.36],
+  ['Hyderabad','India','🇮🇳',17.39,78.49],
+  ['Pune','India','🇮🇳',18.52,73.86],
+  ['Ahmedabad','India','🇮🇳',23.02,72.57],
+  ['Goa','India','🇮🇳',15.30,74.12],
+  ['Karachi','Pakistan','🇵🇰',24.86,67.01],
+  ['Lahore','Pakistan','🇵🇰',31.55,74.34],
+  ['Islamabad','Pakistan','🇵🇰',33.68,73.05],
+  ['Dhaka','Bangladesh','🇧🇩',23.81,90.41],
+  ['Kathmandu','Nepal','🇳🇵',27.71,85.32],
+  ['Colombo','Sri Lanka','🇱🇰',6.93,79.86],
+  ['Dubai','United Arab Emirates','🇦🇪',25.20,55.27],
+  ['Abu Dhabi','United Arab Emirates','🇦🇪',24.45,54.38],
+  ['Doha','Qatar','🇶🇦',25.29,51.53],
+  ['Riyadh','Saudi Arabia','🇸🇦',24.71,46.68],
+  ['Jeddah','Saudi Arabia','🇸🇦',21.49,39.19],
+  ['Tel Aviv','Israel','🇮🇱',32.08,34.78],
+  ['Jerusalem','Israel','🇮🇱',31.78,35.22],
+  ['Beirut','Lebanon','🇱🇧',33.89,35.50],
+  ['Amman','Jordan','🇯🇴',31.95,35.93],
+  ['Istanbul','Turkey','🇹🇷',41.01,28.98],
+  ['Ankara','Turkey','🇹🇷',39.93,32.86],
+  ['Tehran','Iran','🇮🇷',35.69,51.39],
+  ['London','United Kingdom','🇬🇧',51.51,-0.13],
+  ['Manchester','United Kingdom','🇬🇧',53.48,-2.24],
+  ['Edinburgh','United Kingdom','🇬🇧',55.95,-3.19],
+  ['Dublin','Ireland','🇮🇪',53.35,-6.26],
+  ['Paris','France','🇫🇷',48.86,2.35],
+  ['Lyon','France','🇫🇷',45.76,4.84],
+  ['Marseille','France','🇫🇷',43.30,5.37],
+  ['Berlin','Germany','🇩🇪',52.52,13.40],
+  ['Munich','Germany','🇩🇪',48.14,11.58],
+  ['Hamburg','Germany','🇩🇪',53.55,9.99],
+  ['Frankfurt','Germany','🇩🇪',50.11,8.68],
+  ['Cologne','Germany','🇩🇪',50.94,6.96],
+  ['Amsterdam','Netherlands','🇳🇱',52.37,4.90],
+  ['Rotterdam','Netherlands','🇳🇱',51.92,4.48],
+  ['Brussels','Belgium','🇧🇪',50.85,4.35],
+  ['Antwerp','Belgium','🇧🇪',51.22,4.40],
+  ['Zurich','Switzerland','🇨🇭',47.38,8.54],
+  ['Geneva','Switzerland','🇨🇭',46.20,6.15],
+  ['Vienna','Austria','🇦🇹',48.21,16.37],
+  ['Prague','Czechia','🇨🇿',50.08,14.44],
+  ['Warsaw','Poland','🇵🇱',52.23,21.01],
+  ['Krakow','Poland','🇵🇱',50.06,19.94],
+  ['Budapest','Hungary','🇭🇺',47.50,19.04],
+  ['Copenhagen','Denmark','🇩🇰',55.68,12.57],
+  ['Stockholm','Sweden','🇸🇪',59.33,18.07],
+  ['Gothenburg','Sweden','🇸🇪',57.71,11.97],
+  ['Oslo','Norway','🇳🇴',59.91,10.75],
+  ['Bergen','Norway','🇳🇴',60.39,5.32],
+  ['Helsinki','Finland','🇫🇮',60.17,24.94],
+  ['Reykjavik','Iceland','🇮🇸',64.15,-21.94],
+  ['Madrid','Spain','🇪🇸',40.42,-3.70],
+  ['Barcelona','Spain','🇪🇸',41.39,2.17],
+  ['Seville','Spain','🇪🇸',37.39,-5.99],
+  ['Valencia','Spain','🇪🇸',39.47,-0.38],
+  ['Lisbon','Portugal','🇵🇹',38.72,-9.14],
+  ['Porto','Portugal','🇵🇹',41.16,-8.63],
+  ['Rome','Italy','🇮🇹',41.90,12.50],
+  ['Milan','Italy','🇮🇹',45.46,9.19],
+  ['Florence','Italy','🇮🇹',43.77,11.26],
+  ['Venice','Italy','🇮🇹',45.44,12.32],
+  ['Naples','Italy','🇮🇹',40.85,14.27],
+  ['Athens','Greece','🇬🇷',37.98,23.73],
+  ['Bucharest','Romania','🇷🇴',44.43,26.10],
+  ['Sofia','Bulgaria','🇧🇬',42.70,23.32],
+  ['Belgrade','Serbia','🇷🇸',44.81,20.46],
+  ['Zagreb','Croatia','🇭🇷',45.81,15.98],
+  ['Moscow','Russia','🇷🇺',55.76,37.62],
+  ['St. Petersburg','Russia','🇷🇺',59.93,30.34],
+  ['Kyiv','Ukraine','🇺🇦',50.45,30.52],
+  ['Cairo','Egypt','🇪🇬',30.04,31.24],
+  ['Alexandria','Egypt','🇪🇬',31.20,29.92],
+  ['Casablanca','Morocco','🇲🇦',33.57,-7.59],
+  ['Marrakesh','Morocco','🇲🇦',31.63,-7.99],
+  ['Tunis','Tunisia','🇹🇳',36.81,10.18],
+  ['Lagos','Nigeria','🇳🇬',6.52,3.38],
+  ['Abuja','Nigeria','🇳🇬',9.08,7.40],
+  ['Accra','Ghana','🇬🇭',5.60,-0.19],
+  ['Nairobi','Kenya','🇰🇪',-1.29,36.82],
+  ['Addis Ababa','Ethiopia','🇪🇹',9.03,38.74],
+  ['Cape Town','South Africa','🇿🇦',-33.92,18.42],
+  ['Johannesburg','South Africa','🇿🇦',-26.20,28.05],
+  ['Durban','South Africa','🇿🇦',-29.86,31.02],
+  ['Dakar','Senegal','🇸🇳',14.69,-17.45],
+  ['New York','United States','🇺🇸',40.71,-74.01],
+  ['Brooklyn','United States','🇺🇸',40.68,-73.95],
+  ['Boston','United States','🇺🇸',42.36,-71.06],
+  ['Washington DC','United States','🇺🇸',38.91,-77.04],
+  ['Philadelphia','United States','🇺🇸',39.95,-75.17],
+  ['Atlanta','United States','🇺🇸',33.75,-84.39],
+  ['Miami','United States','🇺🇸',25.76,-80.19],
+  ['Orlando','United States','🇺🇸',28.54,-81.38],
+  ['Chicago','United States','🇺🇸',41.88,-87.63],
+  ['Detroit','United States','🇺🇸',42.33,-83.05],
+  ['Minneapolis','United States','🇺🇸',44.98,-93.27],
+  ['Nashville','United States','🇺🇸',36.16,-86.78],
+  ['New Orleans','United States','🇺🇸',29.95,-90.07],
+  ['Houston','United States','🇺🇸',29.76,-95.37],
+  ['Austin','United States','🇺🇸',30.27,-97.74],
+  ['Dallas','United States','🇺🇸',32.78,-96.80],
+  ['Denver','United States','🇺🇸',39.74,-104.99],
+  ['Phoenix','United States','🇺🇸',33.45,-112.07],
+  ['Las Vegas','United States','🇺🇸',36.17,-115.14],
+  ['San Francisco','United States','🇺🇸',37.77,-122.42],
+  ['Los Angeles','United States','🇺🇸',34.05,-118.24],
+  ['San Diego','United States','🇺🇸',32.72,-117.16],
+  ['Portland','United States','🇺🇸',45.52,-122.68],
+  ['Seattle','United States','🇺🇸',47.61,-122.33],
+  ['Honolulu','United States','🇺🇸',21.31,-157.86],
+  ['Anchorage','United States','🇺🇸',61.22,-149.90],
+  ['Toronto','Canada','🇨🇦',43.65,-79.38],
+  ['Montreal','Canada','🇨🇦',45.50,-73.57],
+  ['Vancouver','Canada','🇨🇦',49.28,-123.12],
+  ['Calgary','Canada','🇨🇦',51.05,-114.07],
+  ['Ottawa','Canada','🇨🇦',45.42,-75.70],
+  ['Mexico City','Mexico','🇲🇽',19.43,-99.13],
+  ['Guadalajara','Mexico','🇲🇽',20.66,-103.35],
+  ['Cancún','Mexico','🇲🇽',21.16,-86.85],
+  ['Tijuana','Mexico','🇲🇽',32.51,-117.04],
+  ['Havana','Cuba','🇨🇺',23.13,-82.36],
+  ['San Juan','Puerto Rico','🇵🇷',18.47,-66.11],
+  ['Panama City','Panama','🇵🇦',8.98,-79.52],
+  ['San José','Costa Rica','🇨🇷',9.93,-84.08],
+  ['Buenos Aires','Argentina','🇦🇷',-34.60,-58.38],
+  ['Córdoba','Argentina','🇦🇷',-31.42,-64.18],
+  ['São Paulo','Brazil','🇧🇷',-23.55,-46.63],
+  ['Rio de Janeiro','Brazil','🇧🇷',-22.91,-43.17],
+  ['Brasília','Brazil','🇧🇷',-15.83,-47.92],
+  ['Salvador','Brazil','🇧🇷',-12.97,-38.50],
+  ['Lima','Peru','🇵🇪',-12.05,-77.04],
+  ['Cusco','Peru','🇵🇪',-13.53,-71.97],
+  ['Santiago','Chile','🇨🇱',-33.45,-70.67],
+  ['Bogotá','Colombia','🇨🇴',4.71,-74.07],
+  ['Medellín','Colombia','🇨🇴',6.24,-75.58],
+  ['Caracas','Venezuela','🇻🇪',10.49,-66.88],
+  ['Quito','Ecuador','🇪🇨',-0.18,-78.47],
+  ['Montevideo','Uruguay','🇺🇾',-34.90,-56.16],
+  ['La Paz','Bolivia','🇧🇴',-16.49,-68.12],
+  ['Asunción','Paraguay','🇵🇾',-25.27,-57.58],
+  ['Sydney','Australia','🇦🇺',-33.87,151.21],
+  ['Melbourne','Australia','🇦🇺',-37.81,144.96],
+  ['Brisbane','Australia','🇦🇺',-27.47,153.03],
+  ['Perth','Australia','🇦🇺',-31.95,115.86],
+  ['Adelaide','Australia','🇦🇺',-34.93,138.60],
+  ['Canberra','Australia','🇦🇺',-35.28,149.13],
+  ['Auckland','New Zealand','🇳🇿',-36.85,174.76],
+  ['Wellington','New Zealand','🇳🇿',-41.29,174.78],
+  ['Christchurch','New Zealand','🇳🇿',-43.53,172.64],
+  ['Suva','Fiji','🇫🇯',-18.12,178.45],
+];
+
+const LOCATIONS = LOCATIONS_RAW.map(([name, region, flag, lat, lon]) => ({
+  name, region, flag, lat, lng: lon,
+}));
+
+let activeLocationField = null;
+let selectedLocation = null;
+
+function openLocationPicker(fieldEl) {
+  if (!profileEditMode) return;
+  activeLocationField = fieldEl;
+  selectedLocation = null;
+  document.getElementById('location-search-input').value = '';
+  document.getElementById('location-confirm').disabled = true;
+  const pin = document.getElementById('world-map-pin');
+  if (pin) pin.style.display = 'none';
+  document.getElementById('location-pin-label').textContent = 'No location selected';
+  filterLocations();
+  document.getElementById('location-modal').classList.add('open');
+  loadWorldMap();
+  setTimeout(() => document.getElementById('location-search-input').focus(), 50);
+}
+
+function closeLocationPicker() {
+  document.getElementById('location-modal').classList.remove('open');
+  activeLocationField = null;
+  selectedLocation = null;
+}
+
+function filterLocations() {
+  const q = document.getElementById('location-search-input').value.toLowerCase().trim();
+  const list = q
+    ? LOCATIONS.filter(l => l.name.toLowerCase().includes(q) || l.region.toLowerCase().includes(q))
+    : LOCATIONS;
+  const container = document.getElementById('location-results');
+  if (list.length === 0) {
+    container.innerHTML = '<div class="location-empty">No matching cities</div>';
+    return;
+  }
+  container.innerHTML = list.map((l, i) => `
+    <div class="location-result" data-idx="${LOCATIONS.indexOf(l)}" onclick="selectLocation(${LOCATIONS.indexOf(l)})">
+      <span class="location-result-flag">${l.flag}</span>
+      <div class="location-result-text">
+        <div class="location-result-name">${l.name}</div>
+        <div class="location-result-region">${l.region}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectLocation(idx) {
+  selectedLocation = LOCATIONS[idx];
+  document.querySelectorAll('.location-result').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.idx) === idx);
+  });
+  const pin = document.getElementById('world-map-pin');
+  if (pin) {
+    pin.setAttribute('cx', lonToX(selectedLocation.lng));
+    pin.setAttribute('cy', latToY(selectedLocation.lat));
+    pin.style.display = 'block';
+  }
+  document.getElementById('location-pin-label').textContent = selectedLocation.name + ', ' + selectedLocation.region;
+  document.getElementById('location-confirm').disabled = false;
+}
+
+const COUNTRY_CODES = {
+  'Republic of Korea':'KR','Japan':'JP','China':'CN','Taiwan':'TW','Mongolia':'MN',
+  'Singapore':'SG','Malaysia':'MY','Thailand':'TH','Vietnam':'VN','Philippines':'PH',
+  'Indonesia':'ID','Cambodia':'KH','Laos':'LA','Myanmar':'MM',
+  'India':'IN','Pakistan':'PK','Bangladesh':'BD','Nepal':'NP','Sri Lanka':'LK',
+  'United Arab Emirates':'AE','Qatar':'QA','Saudi Arabia':'SA','Israel':'IL',
+  'Lebanon':'LB','Jordan':'JO','Turkey':'TR','Iran':'IR',
+  'United Kingdom':'UK','Ireland':'IE','France':'FR','Germany':'DE','Netherlands':'NL',
+  'Belgium':'BE','Switzerland':'CH','Austria':'AT','Czechia':'CZ','Poland':'PL',
+  'Hungary':'HU','Denmark':'DK','Sweden':'SE','Norway':'NO','Finland':'FI',
+  'Iceland':'IS','Spain':'ES','Portugal':'PT','Italy':'IT','Greece':'GR',
+  'Romania':'RO','Bulgaria':'BG','Serbia':'RS','Croatia':'HR','Russia':'RU','Ukraine':'UA',
+  'Egypt':'EG','Morocco':'MA','Tunisia':'TN','Nigeria':'NG','Ghana':'GH','Kenya':'KE',
+  'Ethiopia':'ET','South Africa':'ZA','Senegal':'SN','Macau':'MO',
+  'United States':'US','Canada':'CA','Mexico':'MX','Cuba':'CU','Puerto Rico':'PR',
+  'Panama':'PA','Costa Rica':'CR',
+  'Argentina':'AR','Brazil':'BR','Peru':'PE','Chile':'CL','Colombia':'CO',
+  'Venezuela':'VE','Ecuador':'EC','Uruguay':'UY','Bolivia':'BO','Paraguay':'PY',
+  'Australia':'AU','New Zealand':'NZ','Fiji':'FJ',
+};
+
+function confirmLocation() {
+  if (!selectedLocation || !activeLocationField) return;
+  if (activeLocationField.dataset.field === 'location') {
+    const code = COUNTRY_CODES[selectedLocation.region] || selectedLocation.region.slice(0,2).toUpperCase();
+    activeLocationField.textContent = selectedLocation.name + ', ' + code;
+  } else {
+    activeLocationField.textContent = selectedLocation.name + ', ' + selectedLocation.region;
+  }
+  closeLocationPicker();
+}
+
+document.getElementById('location-modal').addEventListener('click', e => {
+  if (e.target.id === 'location-modal') closeLocationPicker();
+});
+
+/* ─── EXTENDED CARD DATA ────────────────────────────────── */
+const EXTRA_CARDS = [
+  { id:10, daysAgo:2, title:"Poster series: transit maps", author:"Doh Lee", initials:"DL", field:"design", tags:["poster","print","cartography"], desc:"A series of 12 posters reimagining Seoul's transit lines as abstract compositions." },
+  { id:11, daysAgo:4, title:"Documentary: salt fields", author:"Ji Seo", initials:"JS", field:"film", tags:["documentary","landscape","west sea"], desc:"Feature-length documentary on the last working salt fields of Korea's west coast." },
+  { id:12, daysAgo:1, title:"Sound walk: Bukchon", author:"Min Baek", initials:"MB", field:"music", tags:["sound art","installation","site-specific"], desc:"A guided audio walk through Bukchon Hanok Village. Listener becomes composer." },
+  { id:13, daysAgo:7, title:"Essay collection: form & error", author:"Ara Jung", initials:"AJ", field:"writing", tags:["essays","design criticism","process"], desc:"12 essays on failure, iteration, and the aesthetic of the unfinished." },
+  { id:14, daysAgo:3, title:"Motion type experiment", author:"Yeon Kim", initials:"YK", field:"design", tags:["motion","type","variable font"], desc:"Variable font driven by mouse velocity. Every word moves differently." },
+  { id:15, daysAgo:9, title:"CLI tool: color extractor", author:"Sori Cha", initials:"SC", field:"development", tags:["CLI","color","open source"], desc:"Command-line tool that extracts a Dakdori-compatible palette from any image." },
+  { id:16, daysAgo:1, title:"Zine: one hundred kitchens", author:"Ji Seo", initials:"JS", field:"photography", tags:["zine","portrait","domestic"], desc:"100 photographs of Korean home kitchens. 100 stories of daily ritual." },
+  { id:17, daysAgo:5, title:"Graphic score series", author:"Min Baek", initials:"MB", field:"illustration", tags:["notation","music","drawing"], desc:"Visual scores for five improvising musicians. Each score is a drawing, not a prescription." },
+  { id:18, daysAgo:6, title:"Interactive fiction: the grid", author:"Ara Jung", initials:"AJ", field:"writing", tags:["interactive fiction","narrative","hypertext"], desc:"A branching short story set inside a city planning database. 24 possible endings." },
+  { id:19, daysAgo:2, title:"Brand: Seocho night market", author:"Yeon Kim", initials:"YK", field:"design", tags:["branding","identity","signage"], desc:"Full identity system for a seasonal night market. Type-only, zero illustration." },
+  { id:20, daysAgo:11, title:"Shader experiments vol.1", author:"Sori Cha", initials:"SC", field:"development", tags:["GLSL","WebGL","generative"], desc:"50 GLSL fragment shaders. Daily practice made public." },
+  { id:21, daysAgo:3, title:"Portrait series: the shift", author:"Ji Seo", initials:"JS", field:"photography", tags:["portrait","labor","documentary"], desc:"Workers photographed at the exact moment their shift ends." },
+  { id:22, daysAgo:1, title:"EP: Low tide", author:"Min Baek", initials:"MB", field:"music", tags:["EP","electronic","release"], desc:"Four-track EP. Synthesizers and field recordings from Incheon port, dawn, February." },
+  { id:23, daysAgo:8, title:"Illustrated bestiary", author:"Doh Lee", initials:"DL", field:"illustration", tags:["illustration","book","creatures"], desc:"An illustrated book of invented creatures, each with taxonomy, habitat, and lore." },
+  { id:24, daysAgo:4, title:"Manifesto: against legibility", author:"Ara Jung", initials:"AJ", field:"writing", tags:["manifesto","design","language"], desc:"A short polemic on why clarity is overrated and difficulty is a form of respect." },
+];
+
+const ALL_CARDS_POOL = [...CARDS, ...EXTRA_CARDS];
+
+/* ─── VIEWED TRACKING ───────────────────────────────────── */
+const VIEWED_IDS = [];
+
+/* ─── INFINITE SCROLL STATE ─────────────────────────────── */
+let scrollPage = 0;
+const PAGE_SIZE = 9;
+let currentPool = [...ALL_CARDS_POOL];
+let isLoading = false;
+
+function getPage(pool, page) {
+  return pool.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+}
+
+function appendCards(cards, containerId) {
+  const grid = document.getElementById(containerId);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = cards.map(cardHTML).join('');
+  while (tmp.firstChild) grid.appendChild(tmp.firstChild);
+}
+
+function renderGridPaged(pool) {
+  scrollPage = 0;
+  currentPool = pool;
+  document.getElementById('home-grid').innerHTML = '';
+  appendCards(getPage(pool, 0), 'home-grid');
+  scrollPage = 1;
+  updateSentinel();
+}
+
+function updateSentinel() {
+  const s = document.getElementById('scroll-sentinel');
+  s.style.display = scrollPage * PAGE_SIZE >= currentPool.length ? 'none' : 'flex';
+}
+
+function loadNextPage() {
+  if (isLoading || scrollPage * PAGE_SIZE >= currentPool.length) return;
+  isLoading = true;
+  const s = document.getElementById('scroll-sentinel');
+  s.textContent = 'Loading…';
+  setTimeout(() => {
+    appendCards(getPage(currentPool, scrollPage), 'home-grid');
+    scrollPage++;
+    isLoading = false;
+    updateSentinel();
+    if (s.style.display !== 'none') s.textContent = '';
+  }, 480);
+}
+
+const scrollObserver = new IntersectionObserver(
+  entries => { if (entries[0].isIntersecting) loadNextPage(); },
+  { rootMargin: '120px' }
+);
+
+/* ─── INIT ──────────────────────────────────────────────── */
+renderGridPaged(ALL_CARDS_POOL);
+renderGrid(CARDS.filter(c=>c.author==='Yeon Kim'), 'profile-grid');
+document.getElementById('search-q').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+scrollObserver.observe(document.getElementById('scroll-sentinel'));
+syncThemeLabel();
+document.querySelectorAll('#tab-about .tag-grid').forEach(g => g.addEventListener('click', tagClickHandler));
+</script>
+</body>
+</html>
